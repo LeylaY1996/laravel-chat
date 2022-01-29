@@ -29,7 +29,7 @@ Vue.component('chat-form', require('./components/ChatForm.vue').default);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
- const app = new Vue({
+const app = new Vue({
     el: '#app',
     //Store chat messages for display in this array.
     data: {
@@ -38,6 +38,14 @@ Vue.component('chat-form', require('./components/ChatForm.vue').default);
     //Upon initialisation, run fetchMessages(). 
     created() {
         this.fetchMessages();
+        console.log(this.messages);
+        window.Echo.private('chat')
+            .listen('MessageSent', (e) => {
+                this.messages.push({
+                    message: e.message.message,
+                    user: e.user
+                });
+            });
     },
     methods: {
         fetchMessages() {
