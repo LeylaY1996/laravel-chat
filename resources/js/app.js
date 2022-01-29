@@ -21,12 +21,40 @@ window.Vue = require('vue').default;
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+Vue.component('chat-messages', require('./components/ChatMessages.vue').default);
+Vue.component('chat-form', require('./components/ChatForm.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const app = new Vue({
+ const app = new Vue({
     el: '#app',
+    //Store chat messages for display in this array.
+    data: {
+        messages: []
+    },
+    //Upon initialisation, run fetchMessages(). 
+    created() {
+        this.fetchMessages();
+    },
+    methods: {
+        fetchMessages() {
+            //GET request to the messages route in our Laravel server to fetch all the messages
+            axios.get('/messages').then(response => {
+                //Save the response in the messages array to display on the chat view
+                this.messages = response.data;
+            });
+        },
+        //Receives the message that was emitted from the ChatForm Vue component
+        addMessage(message) {
+            //Pushes it to the messages array
+            this.messages.push(message);
+            //POST request to the messages route with the message data in order for our Laravel server to broadcast it.
+            axios.post('/messages', message).then(response => {
+                console.log(response.data);
+            });
+        }
+    }
 });
